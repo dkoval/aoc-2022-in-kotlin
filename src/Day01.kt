@@ -1,52 +1,36 @@
 import java.util.*
 
 fun main() {
-    fun part1(input: List<String>): Int {
-        var sum = 0
-        var best = 0
-        for (s in input) {
-            if (s.isNotEmpty()) {
-                sum += s.toInt()
-                best = maxOf(best, sum)
-            } else {
-                sum = 0
-            }
-        }
-        return best
+    fun parseInput(input: String): List<List<Int>> =
+        input.split("\n\n").map { group -> group.lines().map { it.toInt() } }
+
+    fun part1(input: String): Int {
+        val groups = parseInput(input)
+        return groups.maxOf { it.sum() }
     }
 
-    fun part2(input: List<String>): Int {
-        // keep top k integers
+    fun part2(input: String): Int {
+        val groups = parseInput(input)
+
+        // min heap to keep top k integers
         val k = 3
-        val minHeap = PriorityQueue<Int>()
+        val pq = PriorityQueue<Int>()
 
-        fun enqueue(x: Int) {
-            minHeap.offer(x)
-            if (minHeap.size > k) {
-                minHeap.poll()
+        for (group in groups) {
+            pq.offer(group.sum())
+            if (pq.size > k) {
+                pq.poll()
             }
         }
-
-        var sum = 0
-        for (s in input) {
-            if (s.isNotEmpty()) {
-                sum += s.toInt()
-            } else {
-                enqueue(sum)
-                sum = 0
-            }
-        }
-
-        enqueue(sum)
-        return minHeap.sum()
+        return pq.sum()
     }
 
     // test if implementation meets criteria from the description, like:
-    val testInput = readInput("Day01_test")
+    val testInput = readInputAsString("Day01_test")
     check(part1(testInput) == 24000)
     check(part2(testInput) == 45000)
 
-    val input = readInput("Day01")
-    println(part1(input))
-    println(part2(input))
+    val input = readInputAsString("Day01")
+    println(part1(input)) // answer = 69310
+    println(part2(input)) // answer = 206104
 }
