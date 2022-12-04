@@ -2,8 +2,8 @@ fun main() {
     fun parseInput(input: List<String>): List<Pair<IntRange, IntRange>> =
         input.map { line ->
                 val (first, second) = line.split(",").map { range ->
-                    val (start, end) = range.split("-")
-                    start.toInt()..end.toInt()
+                    val (start, end) = range.split("-").map { it.toInt() }
+                    start..end
                 }
                 first to second
             }
