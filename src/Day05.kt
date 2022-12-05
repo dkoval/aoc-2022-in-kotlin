@@ -26,7 +26,7 @@ fun main() {
         }
 
         return buildString {
-            stacks.forEach { stack -> append(stack.pollLast()) }
+            stacks.forEach { stack -> append(stack.peekLast()) }
         }
     }
 
