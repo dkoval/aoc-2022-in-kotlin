@@ -1,11 +1,11 @@
 fun main() {
-    fun solve(input: String, k: Int): Int {
+    fun solve(input: String, windowSize: Int): Int {
         // sliding window [start : start + k - 1]
         var start = 0
         val seen = mutableMapOf<Char, Int>()
-        while (start + k < input.length) {
+        while (start + windowSize < input.length) {
             // starting from `start` index, check next k characters
-            for (i in start until start + k) {
+            for (i in start until start + windowSize) {
                 if (input[i] in seen) {
                     start = seen[input[i]]!! + 1
                     seen.clear()
@@ -15,8 +15,8 @@ fun main() {
             }
 
             // are checked k characters unique?
-            if (seen.size == k) {
-                return start + k
+            if (seen.size == windowSize) {
+                return start + windowSize
             }
         }
         return -1
