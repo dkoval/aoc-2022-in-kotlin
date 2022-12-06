@@ -2,13 +2,12 @@ fun main() {
     fun solve(input: String, windowSize: Int): Int {
         // sliding window [start : start + k - 1]
         var start = 0
-        val seen = mutableMapOf<Char, Int>()
         while (start + windowSize < input.length) {
             // starting from `start` index, check next k characters
+            val seen = hashMapOf<Char, Int>()
             for (i in start until start + windowSize) {
                 if (input[i] in seen) {
                     start = seen[input[i]]!! + 1
-                    seen.clear()
                     break
                 }
                 seen[input[i]] = i
