@@ -49,7 +49,7 @@ fun main() {
     fun buildFilesystem(input: List<String>): Directory =
         Directory("/", null).also { parseInput(input, 1, it) }
 
-    fun traverseFilesystem(root: Filesystem, onDirectory: (dirSize: Int) -> Unit): Int {
+    fun traverseFilesystem(root: Directory, onDirectory: (dirSize: Int) -> Unit): Int {
         fun dfs(current: Filesystem): Int = when (current) {
             is File -> current.size
             is Directory -> current.children.values.sumOf { dfs(it) }.also { size -> onDirectory(size) }
