@@ -16,7 +16,7 @@ data class Directory(
 ) : Filesystem(name, parent)
 
 fun main() {
-    fun parseInput(current: Directory?, input: List<String>, idx: Int) {
+    fun parseInput(input: List<String>, idx: Int, current: Directory?) {
         if (current == null || idx >= input.size) {
             return
         }
@@ -25,82 +25,66 @@ fun main() {
         if (line.startsWith("$")) {
             val command = line.removePrefix("$ ")
             if (command == "ls") {
-                parseInput(current, input, idx + 1)
+                parseInput(input, idx + 1, current)
             } else {
-                // cd <directory name>
+                // format: cd <directory>
                 val dir = command.removePrefix("cd ")
                 val newCurrent = if (dir == "..") current.parent else current.children[dir] as? Directory
-                parseInput(newCurrent, input, idx + 1)
+                parseInput(input, idx + 1, newCurrent)
             }
         } else {
             if (line.startsWith("dir")) {
-                // dir <directory name>
-                val name = line.removePrefix("dir ")
-                current.children[name] = Directory(name, current)
+                // format: dir <directory>
+                val dir = line.removePrefix("dir ")
+                current.children[dir] = Directory(dir, current)
             } else {
-                // <file size> <file name>
-                val (size, name) = line.split(" ")
-                current.children[name] = File(name, size.toInt(), current)
+                // format: <size> <file>
+                val (size, file) = line.split(" ")
+                current.children[file] = File(file, size.toInt(), current)
             }
-            parseInput(current, input, idx + 1)
+            parseInput(input, idx + 1, current)
         }
     }
 
     fun buildFilesystem(input: List<String>): Directory =
-        Directory("/", null)
-            .also { parseInput(it, input, 1) }
+        Directory("/", null).also { parseInput(input, 1, it) }
 
-    fun traverseFilesystem(root: Filesystem, hook: (dirSize: Int) -> Unit = {}): Int {
+    fun traverseFilesystem(root: Filesystem, onDirectory: (dirSize: Int) -> Unit): Int {
         fun dfs(current: Filesystem): Int = when (current) {
             is File -> current.size
-            is Directory -> current.children.values.sumOf { dfs(it) }
-                .also { size -> hook(size) }
+            is Directory -> current.children.values.sumOf { dfs(it) }.also { size -> onDirectory(size) }
         }
         return dfs(root)
     }
 
-    class Hook1(private val thresholdSize: Int) : (Int) -> Unit {
-        private var _sum = 0
-        val sumOf: Int get() = _sum
-
-        override fun invoke(dirSize: Int) {
-            if (dirSize <= thresholdSize) {
-                _sum += dirSize
-            }
-        }
-    }
-
-    class Hook2(private val needSize: Int) : (Int) -> Unit {
-        private var _minSize: Int = Int.MAX_VALUE
-        val minSize: Int get() = _minSize
-
-        override fun invoke(dirSize: Int) {
-            if (dirSize >= needSize) {
-                _minSize = minOf(_minSize, dirSize)
-            }
-        }
-    }
-
     fun part1(input: List<String>): Int {
         val thresholdSize = 100000
-
         val root = buildFilesystem(input)
-        val hook = Hook1(thresholdSize)
-        traverseFilesystem(root, hook)
-        return hook.sumOf
+
+        var sum = 0
+        traverseFilesystem(root) { dirSize ->
+            if (dirSize <= thresholdSize) {
+                sum += dirSize
+            }
+        }
+        return sum
     }
 
     fun part2(input: List<String>): Int {
         val diskSize = 70000000
         val updateSize = 30000000
-
         val root = buildFilesystem(input)
-        val unusedSize = diskSize - traverseFilesystem(root)
-        val needSize = updateSize - unusedSize
 
-        val hook = Hook2(needSize)
-        traverseFilesystem(root, hook)
-        return hook.minSize
+        val dirSizes = mutableListOf<Int>()
+        val usedSize = traverseFilesystem(root) { dirSize ->
+            dirSizes += dirSize
+        }
+
+        val unusedSize = diskSize - usedSize
+        val needSize = updateSize - unusedSize
+        return dirSizes.asSequence()
+            .filter { dirSize -> dirSize >= needSize }
+            .min()
     }
 
     // test if implementation meets criteria from the description, like:
