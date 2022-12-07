@@ -50,44 +50,57 @@ fun main() {
         Directory("/", null)
             .also { parseInput(it, input, 1) }
 
-    fun dirSizes(root: Filesystem): Map<String, Int> {
-        val dirs = mutableMapOf<String, Int>()
+    fun traverseFilesystem(root: Filesystem, hook: (dirSize: Int) -> Unit = {}): Int {
         fun dfs(current: Filesystem): Int = when (current) {
             is File -> current.size
             is Directory -> current.children.values.sumOf { dfs(it) }
-                .also { size ->
-                    // nested directories are not guaranteed to have unique names
-                    val name = current.parent?.name.orEmpty() + "/" + current.name
-                    dirs[name] = size
-                }
+                .also { size -> hook(size) }
         }
+        return dfs(root)
+    }
 
-        dfs(root)
-        return dirs
+    class Hook1(private val thresholdSize: Int) : (Int) -> Unit {
+        private var _sum = 0
+        val sumOf: Int get() = _sum
+
+        override fun invoke(dirSize: Int) {
+            if (dirSize <= thresholdSize) {
+                _sum += dirSize
+            }
+        }
+    }
+
+    class Hook2(private val needSize: Int) : (Int) -> Unit {
+        private var _minSize: Int = Int.MAX_VALUE
+        val minSize: Int get() = _minSize
+
+        override fun invoke(dirSize: Int) {
+            if (dirSize >= needSize) {
+                _minSize = minOf(_minSize, dirSize)
+            }
+        }
     }
 
     fun part1(input: List<String>): Int {
-        val root = buildFilesystem(input)
-
         val thresholdSize = 100000
-        val dirSizes = dirSizes(root)
-        return dirSizes.values.asSequence()
-            .filter { it <= thresholdSize }
-            .sum()
+
+        val root = buildFilesystem(input)
+        val hook = Hook1(thresholdSize)
+        traverseFilesystem(root, hook)
+        return hook.sumOf
     }
 
     fun part2(input: List<String>): Int {
-        val root = buildFilesystem(input)
-
         val diskSize = 70000000
         val updateSize = 30000000
 
-        val dirSizes = dirSizes(root)
-        val unusedSize = diskSize - dirSizes["//"]!!
+        val root = buildFilesystem(input)
+        val unusedSize = diskSize - traverseFilesystem(root)
         val needSize = updateSize - unusedSize
-        return dirSizes.values.asSequence()
-            .filter { it >= needSize }
-            .min()
+
+        val hook = Hook2(needSize)
+        traverseFilesystem(root, hook)
+        return hook.minSize
     }
 
     // test if implementation meets criteria from the description, like:
