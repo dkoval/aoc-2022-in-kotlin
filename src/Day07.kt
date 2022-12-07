@@ -29,8 +29,7 @@ fun main() {
             } else {
                 // format: cd <directory>
                 val dir = command.removePrefix("cd ")
-                val newCurrent = if (dir == "..") current.parent else current.children[dir] as? Directory
-                parseInput(input, idx + 1, newCurrent)
+                parseInput(input, idx + 1, if (dir == "..") current.parent else current.children[dir] as? Directory)
             }
         } else {
             if (line.startsWith("dir")) {
