@@ -78,11 +78,10 @@ fun main() {
         }
 
         val visible = findVisibleTreesInInterior(grid)
-        val deltas = arrayOf(-1 to 0, 0 to -1, 1 to 0, 0 to 1) // look up, left, down, right
+        val deltas = arrayOf(-1 to 0, 1 to 0, 0 to -1, 0 to 1) // look up, down, left, right
 
-        return visible.fold(0) { bestScore, (row, col) ->
-            val score = deltas.fold(1) { acc, (dx, dy) -> acc * viewingDistance(row, col, dx, dy) }
-            maxOf(bestScore, score)
+        return visible.maxOf { (row, col) ->
+            deltas.fold(1) { acc, (dx, dy) -> acc * viewingDistance(row, col, dx, dy) }
         }
     }
 
