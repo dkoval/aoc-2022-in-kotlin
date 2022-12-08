@@ -7,21 +7,25 @@ fun main() {
         val n = grid[0].size
         val visible = hashSetOf<Pair<Int, Int>>()
 
+        // last[0] - the last highest tree when going from left-to-right (in a row) or top-to-bottom (in a column)
+        // last[1] - the last highest tree when going from right-to-left (in a row) or bottom-to-top (in a column)
+        val last = IntArray(2)
+
         // process interior rows
         for (row in 1 until m - 1) {
             // scan i-th row in both directions
-            var lastLeft = grid[row][0]
-            var lastRight = grid[row][n - 1]
+            last[0] = grid[row][0]
+            last[1] = grid[row][n - 1]
             for (leftCol in 1 until n - 1) {
-                if (grid[row][leftCol] > lastLeft) {
+                if (grid[row][leftCol] > last[0]) {
+                    last[0] = grid[row][leftCol]
                     visible += row to leftCol
-                    lastLeft = grid[row][leftCol]
                 }
 
                 val rightCol = n - leftCol - 1
-                if (grid[row][rightCol] > lastRight) {
+                if (grid[row][rightCol] > last[1]) {
+                    last[1] = grid[row][rightCol]
                     visible += row to rightCol
-                    lastRight = grid[row][rightCol]
                 }
             }
         }
@@ -29,18 +33,18 @@ fun main() {
         // process interior columns
         for (col in 1 until n - 1) {
             // scan i-th column in both directions
-            var lastTop = grid[0][col]
-            var lastBottom = grid[m - 1][col]
+            last[0] = grid[0][col]
+            last[1] = grid[m - 1][col]
             for (topRow in 1 until m - 1) {
-                if (grid[topRow][col] > lastTop) {
+                if (grid[topRow][col] > last[0]) {
+                    last[0] = grid[topRow][col]
                     visible += topRow to col
-                    lastTop = grid[topRow][col]
                 }
 
                 val bottomRow = m - topRow - 1
-                if (grid[bottomRow][col] > lastBottom) {
+                if (grid[bottomRow][col] > last[1]) {
+                    last[1] = grid[bottomRow][col]
                     visible += bottomRow to col
-                    lastBottom = grid[bottomRow][col]
                 }
             }
         }
