@@ -55,7 +55,7 @@ fun main() {
         val n = grid[0].size
 
         val visible = findVisibleTreesInInterior(grid)
-        return 2 * (m + n - 2) + /* visible on the edge */ + visible.size /* visible in the interior */
+        return 2 * (m + n - 2) /* visible on the edge */ + visible.size /* visible in the interior */
     }
 
     fun part2(input: List<String>): Int {
