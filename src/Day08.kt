@@ -7,46 +7,40 @@ fun main() {
         val n = grid[0].size
         val visible = hashSetOf<Pair<Int, Int>>()
 
-        // TODO: make rows and columns processing more generic
-
         // process interior rows
         for (row in 1 until m - 1) {
-            // scan i-th row left to right
-            var last = grid[row][0]
-            for (col in 1 until n - 1) {
-                if (grid[row][col] > last) {
-                    visible += row to col
-                    last = grid[row][col]
+            // scan i-th row in both directions
+            var lastLeft = grid[row][0]
+            var lastRight = grid[row][n - 1]
+            for (leftCol in 1 until n - 1) {
+                if (grid[row][leftCol] > lastLeft) {
+                    visible += row to leftCol
+                    lastLeft = grid[row][leftCol]
                 }
-            }
 
-            // scan i-th row right to left
-            last = grid[row][n - 1]
-            for (col in n - 2 downTo 1) {
-                if (grid[row][col] > last) {
-                    visible += row to col
-                    last = grid[row][col]
+                val rightCol = n - leftCol - 1
+                if (grid[row][rightCol] > lastRight) {
+                    visible += row to rightCol
+                    lastRight = grid[row][rightCol]
                 }
             }
         }
 
         // process interior columns
         for (col in 1 until n - 1) {
-            // scan i-th column top to bottom
-            var last = grid[0][col]
-            for (row in 1 until m - 1) {
-                if (grid[row][col] > last) {
-                    visible += row to col
-                    last = grid[row][col]
+            // scan i-th column in both directions
+            var lastTop = grid[0][col]
+            var lastBottom = grid[m - 1][col]
+            for (topRow in 1 until m - 1) {
+                if (grid[topRow][col] > lastTop) {
+                    visible += topRow to col
+                    lastTop = grid[topRow][col]
                 }
-            }
 
-            // scan i-th column bottom to top
-            last = grid[m - 1][col]
-            for (row in m - 2 downTo 1) {
-                if (grid[row][col] > last) {
-                    visible += row to col
-                    last = grid[row][col]
+                val bottomRow = m - topRow - 1
+                if (grid[bottomRow][col] > lastBottom) {
+                    visible += bottomRow to col
+                    lastBottom = grid[bottomRow][col]
                 }
             }
         }
