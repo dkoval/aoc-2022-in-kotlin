@@ -1,19 +1,21 @@
-sealed class Filesystem(
+private sealed class Filesystem(
     open val name: String,
     open val parent: Directory?
 )
 
-data class File(
+private data class File(
     override val name: String,
     val size: Int,
     override val parent: Directory?
 ) : Filesystem(name, parent)
 
-data class Directory(
+private data class Directory(
     override val name: String,
     override val parent: Directory?,
     val children: MutableMap<String, Filesystem> = mutableMapOf()
 ) : Filesystem(name, parent)
+
+private const val DAY_ID = "07"
 
 fun main() {
     fun parseInput(input: List<String>, idx: Int, current: Directory?) {
@@ -87,11 +89,11 @@ fun main() {
     }
 
     // test if implementation meets criteria from the description, like:
-    val testInput = readInput("Day07_test")
+    val testInput = readInput("Day${DAY_ID}_test")
     check(part1(testInput) == 95437)
     check(part2(testInput) == 24933642)
 
-    val input = readInput("Day07")
+    val input = readInput("Day${DAY_ID}")
     println(part1(input)) // answer = 1348005
     println(part2(input)) // answer = 12785886
 }

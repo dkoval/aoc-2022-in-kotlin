@@ -1,3 +1,5 @@
+private const val DAY_ID = "08"
+
 fun main() {
     fun parseInput(input: List<String>): List<List<Int>> =
         input.map { line -> line.map { it.digitToInt() } }
@@ -86,11 +88,11 @@ fun main() {
     }
 
     // test if implementation meets criteria from the description, like:
-    val testInput = readInput("Day08_test")
+    val testInput = readInput("Day${DAY_ID}_test")
     check(part1(testInput) == 21)
     check(part2(testInput) == 8)
 
-    val input = readInput("Day08")
+    val input = readInput("Day${DAY_ID}")
     println(part1(input)) // answer = 1560
     println(part2(input)) // answer = 252000
 }

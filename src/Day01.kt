@@ -1,5 +1,7 @@
 import java.util.*
 
+private const val DAY_ID = "01"
+
 fun main() {
     fun parseInput(input: String): List<List<Int>> =
         input.split("\n\n").map { group -> group.lines().map { it.toInt() } }
@@ -26,11 +28,11 @@ fun main() {
     }
 
     // test if implementation meets criteria from the description, like:
-    val testInput = readInputAsString("Day01_test")
+    val testInput = readInputAsString("Day${DAY_ID}_test")
     check(part1(testInput) == 24000)
     check(part2(testInput) == 45000)
 
-    val input = readInputAsString("Day01")
+    val input = readInputAsString("Day${DAY_ID}")
     println(part1(input)) // answer = 69310
     println(part2(input)) // answer = 206104
 }

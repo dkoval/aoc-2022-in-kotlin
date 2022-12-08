@@ -1,3 +1,5 @@
+private const val DAY_ID = "04"
+
 fun main() {
     fun parseInput(input: List<String>): List<Pair<IntRange, IntRange>> =
         input.map { line ->
@@ -25,11 +27,11 @@ fun main() {
     }
 
     // test if implementation meets criteria from the description, like:
-    val testInput = readInput("Day04_test")
+    val testInput = readInput("Day${DAY_ID}_test")
     check(part1(testInput) == 2)
     check(part2(testInput) == 4)
 
-    val input = readInput("Day04")
+    val input = readInput("Day${DAY_ID}")
     println(part1(input)) // answer = 588
     println(part2(input)) // answer = 911
 }

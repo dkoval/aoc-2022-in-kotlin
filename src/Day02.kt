@@ -1,4 +1,4 @@
-enum class Shape(val score: Int) {
+private enum class Shape(val score: Int) {
     // rock
     A(1) {
         override fun wins(): Shape = C
@@ -23,7 +23,7 @@ enum class Shape(val score: Int) {
     fun wins(opponent: Shape): Boolean = wins() == opponent
 }
 
-enum class RoundEnd(val score: Int) {
+private enum class RoundEnd(val score: Int) {
     // you need to lose
     X(0),
 
@@ -33,6 +33,8 @@ enum class RoundEnd(val score: Int) {
     // you need to win
     Z(6)
 }
+
+private const val DAY_ID = "02"
 
 fun main() {
     fun part1(input: List<String>): Int {
@@ -70,11 +72,11 @@ fun main() {
     }
 
     // test if implementation meets criteria from the description, like:
-    val testInput = readInput("Day02_test")
+    val testInput = readInput("Day${DAY_ID}_test")
     check(part1(testInput) == 15)
     check(part2(testInput) == 12)
 
-    val input = readInput("Day02")
+    val input = readInput("Day${DAY_ID}")
     println(part1(input)) // answer = 14375
     println(part2(input)) // answer = 10274
 }

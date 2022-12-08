@@ -1,5 +1,7 @@
 import java.util.*
 
+private const val DAY_ID = "05"
+
 fun main() {
     data class Instruction(val quantity: Int, val from: Int, val to: Int)
 
@@ -53,11 +55,11 @@ fun main() {
         }
 
     // test if implementation meets criteria from the description, like:
-    val testInput = readInput("Day05_test")
+    val testInput = readInput("Day${DAY_ID}_test")
     check(part1(testInput) == "CMZ")
     check(part2(testInput) == "MCD")
 
-    val input = readInput("Day05")
+    val input = readInput("Day${DAY_ID}")
     println(part1(input)) // answer = JCMHLVGMG
     println(part2(input)) // answer = LVMRWSSPZ
 }

@@ -1,3 +1,5 @@
+private const val DAY_ID = "03"
+
 fun main() {
     fun itemPriority(c: Char): Int = if (c.isLowerCase()) c - 'a' + 1 else c - 'A' + 27
 
@@ -19,11 +21,11 @@ fun main() {
         }.sum()
 
     // test if implementation meets criteria from the description, like:
-    val testInput = readInput("Day03_test")
+    val testInput = readInput("Day${DAY_ID}_test")
     check(part1(testInput) == 157)
     check(part2(testInput) == 70)
 
-    val input = readInput("Day03")
+    val input = readInput("Day${DAY_ID}")
     println(part1(input)) // answer = 7785
     println(part2(input)) // answer = 2633
 }
