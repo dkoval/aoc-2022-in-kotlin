@@ -1,6 +1,6 @@
 fun main() {
     fun parseInput(input: List<String>): List<List<Int>> =
-        input.map { line -> line.map { it - '0' } }
+        input.map { line -> line.map { it.digitToInt() } }
 
     fun findVisibleTreesInInterior(grid: List<List<Int>>): Set<Pair<Int, Int>> {
         val m = grid.size
@@ -21,7 +21,6 @@ fun main() {
                     last[0] = grid[row][left]
                     visible += row to left
                 }
-
                 val right = n - left - 1
                 if (grid[row][right] > last[1]) {
                     last[1] = grid[row][right]
@@ -40,7 +39,6 @@ fun main() {
                     last[0] = grid[top][col]
                     visible += top to col
                 }
-
                 val bottom = m - top - 1
                 if (grid[bottom][col] > last[1]) {
                     last[1] = grid[bottom][col]
@@ -82,7 +80,6 @@ fun main() {
 
         val visible = findVisibleTreesInInterior(grid)
         val deltas = arrayOf(-1 to 0, 1 to 0, 0 to -1, 0 to 1) // look up, down, left, right
-
         return visible.maxOf { (row, col) ->
             deltas.fold(1) { acc, (dx, dy) -> acc * viewingDistance(row, col, dx, dy) }
         }
