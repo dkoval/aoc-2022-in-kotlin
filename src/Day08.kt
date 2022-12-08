@@ -61,44 +61,24 @@ fun main() {
         val m = grid.size
         val n = grid[0].size
 
-        val visible = findVisibleTreesInInterior(grid)
+        fun viewingDistance(row: Int, col: Int, dx: Int, dy: Int): Int {
+            var dist = 1
+            var nextRow = row + dx
+            var nextCol = col + dy
+            while (nextRow in 1 until m - 1 && nextCol in 1 until n - 1 && grid[nextRow][nextCol] < grid[row][col]) {
+                dist++
+                nextRow += dx
+                nextCol += dy
+            }
+            return dist
+        }
+
         var bestScore = 0
+        val deltas = arrayOf(-1 to 0, 0 to -1, 1 to 0, 0 to 1) // look up, left, down, right
+        val visible = findVisibleTreesInInterior(grid)
         for ((row, col) in visible) {
-            // TODO: make more generic
-
-            // look up
-            var i = row - 1
-            var distUp = 1
-            while (i > 0 && grid[i][col] < grid[row][col]) {
-                i--
-                distUp++
-            }
-
-            // look down
-            i = row + 1
-            var distDown = 1
-            while (i < m - 1 && grid[i][col] < grid[row][col]) {
-                i++
-                distDown++
-            }
-
-            // look left
-            var j = col - 1
-            var distLeft = 1
-            while (j > 0 && grid[row][j] < grid[row][col]) {
-                j--
-                distLeft++
-            }
-
-            // look right
-            j = col + 1
-            var distRight = 1
-            while (j < n - 1 && grid[row][j] < grid[row][col]) {
-                j++
-                distRight++
-            }
-
-            bestScore = maxOf(bestScore, distUp * distDown * distLeft * distRight)
+            val score = deltas.fold(1) { acc, (dx, dy) -> acc * viewingDistance(row, col, dx, dy) }
+            bestScore = maxOf(bestScore, score)
         }
         return bestScore
     }
