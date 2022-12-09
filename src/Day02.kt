@@ -1,3 +1,5 @@
+private const val DAY_ID = "02"
+
 private enum class Shape(val score: Int) {
     // rock
     A(1) {
@@ -33,8 +35,6 @@ private enum class RoundEnd(val score: Int) {
     // you need to win
     Z(6)
 }
-
-private const val DAY_ID = "02"
 
 fun main() {
     fun part1(input: List<String>): Int {

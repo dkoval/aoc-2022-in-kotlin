@@ -1,3 +1,5 @@
+private const val DAY_ID = "07"
+
 private sealed class Filesystem(
     open val name: String,
     open val parent: Directory?
@@ -14,8 +16,6 @@ private data class Directory(
     override val parent: Directory?,
     val children: MutableMap<String, Filesystem> = mutableMapOf()
 ) : Filesystem(name, parent)
-
-private const val DAY_ID = "07"
 
 fun main() {
     fun parseInput(input: List<String>, idx: Int, current: Directory?) {
