@@ -42,7 +42,6 @@ fun main() {
                         tail.col == head.col -> tail.move(if (head.row > tail.row) Direction.U else Direction.D)
                         // head and tail aren't in the same row or column, therefore move tail one step diagonally to keep up
                         else -> {
-
                             if (head.row > tail.row) {
                                 tail.move(if (tail.col < head.col) Direction.UR else Direction.UL)
                             } else {
