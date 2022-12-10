@@ -2,34 +2,32 @@ private const val DAY_ID = "10"
 
 fun main() {
     fun part1(input: List<String>): Int {
-        val cycles = mutableSetOf(20, 60, 100, 140, 180, 220)
+        val cycles = setOf(20, 60, 100, 140, 180, 220)
 
         var x = 1
+        val signalStrengths = mutableListOf<Int>()
+        fun checkCycle(cycle: Int) {
+            if (cycle in cycles) {
+                signalStrengths += x * cycle
+            }
+        }
+
         var i = 1
-        val strengths = mutableListOf<Int>()
         for (line in input) {
             if (line.startsWith("addx")) {
                 // addx <delta>
                 val delta = line.removePrefix("addx ").toInt()
-                // evaluate "start", "during" and "finish" phases of an "addx" instruction
-                for ((step, inc) in arrayOf(0 to 0, 1 to 0, 2 to delta)) {
-                    val cycle = i + step
-                    if (cycle in cycles) {
-                        strengths += (x + inc) * cycle
-                        cycles -= cycle
-                    }
+                // "start" and "during" phases of an "addx" instruction do not modify x
+                repeat(2) {
+                    checkCycle(i++)
                 }
                 x += delta
-                i += 2
-                if (cycles.isEmpty()) {
-                    break
-                }
             } else {
                 // noop
-                i++
+                checkCycle(i++)
             }
         }
-        return strengths.sum()
+        return signalStrengths.sum()
     }
 
     fun part2(input: List<String>): String {
@@ -53,7 +51,7 @@ fun main() {
             if (line.startsWith("addx")) {
                 // addx <delta>
                 val delta = line.removePrefix("addx ").toInt()
-                // "start" and "during" phases of an "addx" instruction do not modify the state of the register X
+                // "start" and "during" phases of an "addx" instruction do not modify x
                 repeat(2) {
                     printPixel(i++)
                 }
