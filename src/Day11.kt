@@ -12,8 +12,14 @@ private data class Monkey(
     val throwToIfFalse: Int
 )
 
-private enum class Operator {
-    ADD, MULT;
+private enum class Operator : (Int, Int) -> Int {
+    ADD {
+        override fun invoke(a: Int, b: Int): Int = a + b
+    },
+
+    MULT {
+        override fun invoke(a: Int, b: Int): Int = a * b
+    };
 
     companion object {
         fun fromString(s: String): Operator = when (s) {
@@ -33,20 +39,17 @@ private sealed class Value {
     }
 }
 
-private sealed class WorryLevel {
-    operator fun plus(v: Value): WorryLevel = updateWith(v) { a, b -> a + b }
-    operator fun times(v: Value): WorryLevel = updateWith(v) { a, b -> a * b }
-    abstract infix fun isDivisibleBy(divisor: Int): Boolean
+private sealed interface WorryLevel {
+    infix fun isDivisibleBy(divisor: Int): Boolean
+    fun updateWith(op: Operator, v: Value): WorryLevel
 
-    protected abstract fun updateWith(v: Value, f: (a: Int, b: Int) -> Int): WorryLevel
-
-    class Part1(initial: Int, private val k: Int) : WorryLevel() {
+    class Part1(initial: Int, private val k: Int) : WorryLevel {
         private var x = initial
 
         override fun isDivisibleBy(divisor: Int): Boolean = x % divisor == 0
 
-        override fun updateWith(v: Value, f: (a: Int, b: Int) -> Int): WorryLevel {
-            x = f(x, v.get())
+        override fun updateWith(op: Operator, v: Value): WorryLevel {
+            x = op(x, v.get())
             x /= k
             return this
         }
@@ -57,16 +60,16 @@ private sealed class WorryLevel {
         }
     }
 
-    class Part2(initial: Int, private val divisors: Set<Int>) : WorryLevel() {
+    class Part2(initial: Int, private val divisors: Set<Int>) : WorryLevel {
         // (a + b) % c = (a % c + b % c) % c
         // (a * b) % c = (a % c * b % c) % c
         private val remainders = divisors.associateWithTo(mutableMapOf()) { divisor -> initial % divisor }
 
         override fun isDivisibleBy(divisor: Int): Boolean = remainders[divisor] == 0
 
-        override fun updateWith(v: Value, f: (a: Int, b: Int) -> Int): WorryLevel {
+        override fun updateWith(op: Operator, v: Value): WorryLevel {
             for (divisor in divisors) {
-                remainders[divisor] = f(remainders[divisor]!!, v.get(divisor)) % divisor
+                remainders[divisor] = op(remainders[divisor]!!, v.get(divisor)) % divisor
             }
             return this
         }
@@ -76,11 +79,6 @@ private sealed class WorryLevel {
             is Value.Old -> remainders[divisor]!!
         }
     }
-}
-
-private fun WorryLevel.invoke(operator: Operator, v: Value): WorryLevel = when (operator) {
-    Operator.ADD -> plus(v)
-    Operator.MULT -> times(v)
 }
 
 fun main() {
@@ -118,7 +116,7 @@ fun main() {
                     inspectedItems[index] += items.size
                     while (!items.isEmpty()) {
                         val old = items.poll()
-                        val new = old.invoke(operator, v)
+                        val new = old.updateWith(operator, v)
                         val throwTo = if (new isDivisibleBy divisor) throwToIfTrue else throwToIfFalse
                         state[throwTo].offer(new)
                     }
