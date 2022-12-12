@@ -2,55 +2,21 @@ import java.util.*
 
 private const val DAY_ID = "11"
 
-private data class Item(val initial: Int) {
-    // mod -> x % mod
-    private val _remainder = mutableMapOf<Int, Int>()
-    val remainder: Map<Int, Int> get() = _remainder
+private data class Monkey(
+    val id: Int,
+    val items: List<Int>,
+    val operator: Operator,
+    val v: Value,
+    val divisor: Int,
+    val throwToIfTrue: Int,
+    val throwToIfFalse: Int
+)
 
-    fun update(x: Int, mods: Set<Int>) {
-        for (mod in mods) {
-            _remainder[mod] = x % mod
-        }
-    }
-
-    fun add(x: Int, mods: Set<Int>): Item {
-        for (mod in mods) {
-            val new = _remainder[mod]!! + x % mod
-            _remainder[mod] = new % mod
-        }
-        return this
-    }
-
-    fun addSelf(mods: Set<Int>): Item {
-        for (mod in mods) {
-            val old = _remainder[mod]!!
-            _remainder[mod] = (old + old) % mod
-        }
-        return this
-    }
-
-    fun mult(x: Int, mods: Set<Int>): Item {
-        for (mod in mods) {
-            val new = _remainder[mod]!! * x % mod
-            _remainder[mod] = new % mod
-        }
-        return this
-    }
-
-    fun multSelf(mods: Set<Int>): Item {
-        for (mod in mods) {
-            val old = _remainder[mod]!!
-            _remainder[mod] = (old * old) % mod
-        }
-        return this
-    }
-}
-
-private enum class Operation {
+private enum class Operator {
     ADD, MULT;
 
     companion object {
-        fun fromString(s: String): Operation = when (s) {
+        fun fromString(s: String): Operator = when (s) {
             "+" -> ADD
             "*" -> MULT
             else -> error("Unknown operation: $s")
@@ -59,130 +25,147 @@ private enum class Operation {
 }
 
 private sealed class Value {
-    data class New(val x: Int) : Value()
+    data class Num(val x: Int) : Value()
     object Old : Value()
 
     companion object {
-        fun fromString(s: String): Value = if (s == "old") Old else New(s.toInt())
+        fun fromString(s: String): Value = if (s == "old") Old else Num(s.toInt())
     }
 }
 
-private data class Monkey<T>(
-    val id: Int,
-    val items: Deque<T>,
-    val operation: Operation,
-    val value: Value,
-    val mod: Int,
-    val throwToMonkeyIfTrue: Int,
-    val throwToMonkeyOtherwise: Int,
-    var inspectedItems: Int = 0
-)
+private sealed interface WorryLevel {
+    operator fun plus(v: Value): WorryLevel
+    operator fun times(v: Value): WorryLevel
+    infix fun isDivisibleBy(divisor: Int): Boolean
+
+    class Part1(initial: Int, private val k: Int) : WorryLevel {
+        private var x = initial
+
+        override fun plus(v: Value): WorryLevel {
+            x += v.get()
+            x /= k
+            return this
+        }
+
+        override fun times(v: Value): WorryLevel {
+            x *= v.get()
+            x /= k
+            return this
+        }
+
+        override fun isDivisibleBy(divisor: Int): Boolean = x % divisor == 0
+
+        private fun Value.get() = when (this) {
+            is Value.Num -> this.x
+            is Value.Old -> x
+        }
+    }
+
+    class Part2(initial: Int, private val divisors: Set<Int>) : WorryLevel {
+        // (a + b) % c = (a % c + b % c) % c
+        // (a * b) % c = (a % c * b % c) % c
+        private val remainders = divisors.associateWithTo(mutableMapOf()) { divisor -> initial % divisor }
+
+        override fun plus(v: Value): WorryLevel {
+            for (divisor in divisors) {
+                var new = remainders[divisor]!!
+                new += v.get(divisor)
+                new %= divisor
+                remainders[divisor] = new
+            }
+            return this
+        }
+
+        override fun times(v: Value): WorryLevel {
+            for (divisor in divisors) {
+                var new = remainders[divisor]!!
+                new *= v.get(divisor)
+                new %= divisor
+                remainders[divisor] = new
+            }
+            return this
+        }
+
+        override fun isDivisibleBy(divisor: Int): Boolean = remainders[divisor] == 0
+
+        private fun Value.get(divisor: Int): Int = when (this) {
+            is Value.Num -> this.x % divisor
+            is Value.Old -> checkNotNull(remainders[divisor]) { "Unexpected divisor: $divisor" }
+        }
+    }
+}
+
+private fun WorryLevel.invoke(operator: Operator, v: Value): WorryLevel = when (operator) {
+    Operator.ADD -> plus(v)
+    Operator.MULT -> times(v)
+}
 
 fun main() {
-    fun <T> parseInput(input: String, transformItem: (item: Int) -> T, onMod: (mod: Int) -> Unit = {}): List<Monkey<T>> {
-        val operationRegex = """old (\*|\+) (\d+|old)""".toRegex()
-        return input.split("\n\n").mapIndexed { index, monkey ->
-            val lines = monkey.split("\n")
+    fun parseInput(input: String): List<Monkey> {
+        val operation = """old (\*|\+) (\d+|old)""".toRegex()
+        return input.split("\n\n").mapIndexed { index, s ->
+            val lines = s.split("\n")
 
-            val items = lines[1].removePrefix("  Starting items: ").split(", ").map { transformItem(it.toInt()) }
-            val (operation, value) = operationRegex.find(lines[2].removePrefix("  Operation: new = "))!!.destructured
-            val mod = lines[3].removePrefix("  Test: divisible by ").toInt()
+            val items = lines[1].removePrefix("  Starting items: ").split(", ").map { it.toInt() }
+            val (operator, v) = operation.find(lines[2].removePrefix("  Operation: new = "))!!.destructured
+            val divisor = lines[3].removePrefix("  Test: divisible by ").toInt()
             val throwToMonkeyIfTrue = lines[4].removePrefix("    If true: throw to monkey ").toInt()
             val throwToMonkeyIfFalse = lines[5].removePrefix("    If false: throw to monkey ").toInt()
 
-            onMod(mod)
-
             Monkey(
                 index,
-                ArrayDeque(items),
-                Operation.fromString(operation),
-                Value.fromString(value),
-                mod,
+                items,
+                Operator.fromString(operator),
+                Value.fromString(v),
+                divisor,
                 throwToMonkeyIfTrue,
                 throwToMonkeyIfFalse
             )
         }
     }
 
-    fun part1(input: String): Int {
-        val rounds = 20
-        val k = 3
+    fun solve(monkeys: List<Monkey>, rounds: Int, transform: (x: Int) -> WorryLevel): Long {
+        val n = monkeys.size
+        val state: List<Queue<WorryLevel>> = monkeys.map { it.items.mapTo(ArrayDeque()) { x -> transform(x) } }
+        val inspectedItems = IntArray(n)
 
-        val data = parseInput(input, transformItem = { it })
         repeat(rounds) {
-            for (monkey in data) {
-                with(monkey) {
-                    inspectedItems += items.size
+            state.forEachIndexed { index, items ->
+                with(monkeys[index]) {
+                    inspectedItems[index] += items.size
                     while (!items.isEmpty()) {
-                        val old = items.pollFirst()
-                        val x = if (value is Value.New) value.x else old
-
-                        var new = when (operation) {
-                            Operation.ADD -> old + x
-                            Operation.MULT -> old * x
-                        }
-                        new /= k
-
-                        val throwTo = if (new % mod == 0) throwToMonkeyIfTrue else throwToMonkeyOtherwise
-                        data[throwTo].items.offerLast(new)
+                        val old = items.poll()
+                        val new = old.invoke(operator, v)
+                        val throwTo = if (new isDivisibleBy divisor) throwToIfTrue else throwToIfFalse
+                        state[throwTo].offer(new)
                     }
                 }
             }
         }
 
-        return data.sortedByDescending { it.inspectedItems }
+        return inspectedItems
+            .also { it.sortDescending() }
             .take(2)
-            .fold(1) { acc, monkey -> acc * monkey.inspectedItems }
+            .fold(1L) { acc, x -> acc * x }
+    }
+
+    fun part1(input: String): Long {
+        val rounds = 20
+        val k = 3
+        val monkeys = parseInput(input)
+        return solve(monkeys, rounds) { x -> WorryLevel.Part1(x, k) }
     }
 
     fun part2(input: String): Long {
         val rounds = 10000
-        val mods = mutableSetOf<Int>()
-        val data = parseInput(input, transformItem = { Item(it) }) { mod -> mods += mod }
-
-        data.forEach { monkey ->
-            monkey.items.forEach { item -> item.update(item.initial, mods) }
-        }
-
-        repeat(rounds) {
-            for (monkey in data) {
-                with(monkey) {
-                    inspectedItems += items.size
-                    while (!items.isEmpty()) {
-                        val old = items.pollFirst()
-                        val new = when (operation) {
-                            Operation.ADD -> {
-                                when (value) {
-                                    is Value.Old -> old.addSelf(mods)
-                                    is Value.New -> old.add(value.x, mods)
-                                }
-                            }
-
-                            Operation.MULT -> {
-                                when (value) {
-                                    is Value.Old -> old.multSelf(mods)
-                                    is Value.New -> old.mult(value.x, mods)
-                                }
-                            }
-                        }
-
-                        val test = new.remainder[mod]!!
-                        val throwToMonkey = if (test == 0) throwToMonkeyIfTrue else throwToMonkeyOtherwise
-                        data[throwToMonkey].items.offerLast(new)
-                    }
-
-                }
-            }
-        }
-
-        return data.sortedByDescending { it.inspectedItems }
-            .take(2)
-            .fold(1L) { acc, monkey -> acc * monkey.inspectedItems }
+        val monkeys = parseInput(input)
+        val divisors = monkeys.asSequence().map { it.divisor }.toSet()
+        return solve(monkeys, rounds) { x -> WorryLevel.Part2(x, divisors) }
     }
 
     // test if implementation meets criteria from the description, like:
     val testInput = readInputAsString("Day${DAY_ID}_test")
-    check(part1(testInput) == 10605)
+    check(part1(testInput) == 10605L)
     check(part2(testInput) == 2713310158L)
 
     val input = readInputAsString("Day${DAY_ID}")
