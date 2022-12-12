@@ -90,7 +90,7 @@ fun main() {
             val lines = s.split("\n")
 
             val items = lines[1].removePrefix("  Starting items: ").split(", ").map { it.toInt() }
-            val (operator, v) = operation.find(lines[2].removePrefix("  Operation: new = "))!!.destructured
+            val (op, v) = lines[2].removePrefix("  Operation: new = ").let { operation.find(it)!!.destructured }
             val divisor = lines[3].removePrefix("  Test: divisible by ").toInt()
             val throwToMonkeyIfTrue = lines[4].removePrefix("    If true: throw to monkey ").toInt()
             val throwToMonkeyIfFalse = lines[5].removePrefix("    If false: throw to monkey ").toInt()
@@ -98,7 +98,7 @@ fun main() {
             Monkey(
                 index,
                 items,
-                Operator.fromString(operator),
+                Operator.fromString(op),
                 Value.fromString(v),
                 divisor,
                 throwToMonkeyIfTrue,
