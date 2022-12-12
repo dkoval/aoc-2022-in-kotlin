@@ -33,27 +33,23 @@ private sealed class Value {
     }
 }
 
-private sealed interface WorryLevel {
-    operator fun plus(v: Value): WorryLevel
-    operator fun times(v: Value): WorryLevel
-    infix fun isDivisibleBy(divisor: Int): Boolean
+private sealed class WorryLevel {
+    operator fun plus(v: Value): WorryLevel = updateWith(v) { a, b -> a + b }
+    operator fun times(v: Value): WorryLevel = updateWith(v) { a, b -> a * b }
+    abstract infix fun isDivisibleBy(divisor: Int): Boolean
 
-    class Part1(initial: Int, private val k: Int) : WorryLevel {
+    protected abstract fun updateWith(v: Value, f: (a: Int, b: Int) -> Int): WorryLevel
+
+    class Part1(initial: Int, private val k: Int) : WorryLevel() {
         private var x = initial
 
-        override fun plus(v: Value): WorryLevel {
-            x += v.get()
-            x /= k
-            return this
-        }
-
-        override fun times(v: Value): WorryLevel {
-            x *= v.get()
-            x /= k
-            return this
-        }
-
         override fun isDivisibleBy(divisor: Int): Boolean = x % divisor == 0
+
+        override fun updateWith(v: Value, f: (a: Int, b: Int) -> Int): WorryLevel {
+            x = f(x, v.get())
+            x /= k
+            return this
+        }
 
         private fun Value.get() = when (this) {
             is Value.Num -> this.x
@@ -61,36 +57,23 @@ private sealed interface WorryLevel {
         }
     }
 
-    class Part2(initial: Int, private val divisors: Set<Int>) : WorryLevel {
+    class Part2(initial: Int, private val divisors: Set<Int>) : WorryLevel() {
         // (a + b) % c = (a % c + b % c) % c
         // (a * b) % c = (a % c * b % c) % c
         private val remainders = divisors.associateWithTo(mutableMapOf()) { divisor -> initial % divisor }
 
-        override fun plus(v: Value): WorryLevel {
-            for (divisor in divisors) {
-                var new = remainders[divisor]!!
-                new += v.get(divisor)
-                new %= divisor
-                remainders[divisor] = new
-            }
-            return this
-        }
-
-        override fun times(v: Value): WorryLevel {
-            for (divisor in divisors) {
-                var new = remainders[divisor]!!
-                new *= v.get(divisor)
-                new %= divisor
-                remainders[divisor] = new
-            }
-            return this
-        }
-
         override fun isDivisibleBy(divisor: Int): Boolean = remainders[divisor] == 0
+
+        override fun updateWith(v: Value, f: (a: Int, b: Int) -> Int): WorryLevel {
+            for (divisor in divisors) {
+                remainders[divisor] = f(remainders[divisor]!!, v.get(divisor)) % divisor
+            }
+            return this
+        }
 
         private fun Value.get(divisor: Int): Int = when (this) {
             is Value.Num -> this.x % divisor
-            is Value.Old -> checkNotNull(remainders[divisor]) { "Unexpected divisor: $divisor" }
+            is Value.Old -> remainders[divisor]!!
         }
     }
 }
@@ -102,7 +85,7 @@ private fun WorryLevel.invoke(operator: Operator, v: Value): WorryLevel = when (
 
 fun main() {
     fun parseInput(input: String): List<Monkey> {
-        val operation = """old (\*|\+) (\d+|old)""".toRegex()
+        val operation = """old ([*+]) (\d+|old)""".toRegex()
         return input.split("\n\n").mapIndexed { index, s ->
             val lines = s.split("\n")
 
