@@ -51,7 +51,7 @@ private sealed class WorryLevel {
             return this
         }
 
-        private fun Value.get() = when (this) {
+        private fun Value.get(): Int = when (this) {
             is Value.Num -> this.x
             is Value.Old -> x
         }
