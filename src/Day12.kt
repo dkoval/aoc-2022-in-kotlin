@@ -73,12 +73,10 @@ fun main() {
                 val curr = q.poll()
                 for ((dx, dy) in directions) {
                     val next = Cell(curr.row + dx, curr.col + dy)
-
                     // out of boundaries or visited?
                     if (!next.withinBoundaries(m, n) || next in visited ) {
                         continue
                     }
-
                     // can go?
                     val h1 = grid[curr.row][curr.col]
                     val h2 = grid[next.row][next.col]
