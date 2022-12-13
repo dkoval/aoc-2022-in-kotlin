@@ -50,22 +50,21 @@ private sealed class PacketItem {
             // base case #2
             if (left is Seq && right is Seq) {
                 var i = 0
-                while (i <= minOf(left.items.size, right.items.size)) {
-                    if (i == left.items.size) {
-                        return if (left.items.size == right.items.size) 0 else -1
-                    }
-
-                    if (i == right.items.size) {
-                        return 1
-                    }
-
+                while (i < minOf(left.items.size, right.items.size)) {
                     val res = compare(left.items[i], right.items[i])
                     if (res != 0) {
                         return res
                     }
                     i++
                 }
-                return 0
+                return when {
+                    // check #1 - lists are of the same length and no comparison makes a decision about the order
+                    left.items.size == right.items.size -> 0
+                    // check #2 - the left list runs out of items first, the inputs are in the right order
+                    i == left.items.size -> -1
+                    // check #3 - the right list runs out of items first, the inputs are not in the right order
+                    else -> 1
+                }
             }
 
             // if exactly one value is an integer, convert it to a list, then retry the comparison
