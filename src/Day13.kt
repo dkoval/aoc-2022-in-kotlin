@@ -107,15 +107,11 @@ fun main() {
         packets.sortWith { left, right -> PacketItem.compare(left, right) }
 
         // find the decoder key
-        var key = 1
-        var i = 0
-        var d = 0
-        while (i < packets.size && d < dividers.size) {
-            if (PacketItem.compare(packets[i], dividers[d]) == 0) {
-                key *= i + 1
-                d++
-            }
-            i++
+        val key = dividers.fold(1) { acc, divider ->
+            val (index, _) = packets.withIndex()
+                .find { (_, item) -> PacketItem.compare(item, divider) == 0 }
+                ?: error("Not found: $divider")
+            acc * (index + 1)
         }
         return key
     }
