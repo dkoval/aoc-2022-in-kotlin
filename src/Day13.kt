@@ -84,17 +84,15 @@ private sealed class PacketItem {
 fun main() {
     fun parseInput(input: String): List<Pair<PacketItem, PacketItem>> =
         input.split("\n\n").map { pair ->
-            val pair = pair.split("\n").map { PacketItem.fromString(it) }
-            pair[0] to pair[1]
+            val res = pair.split("\n").map { PacketItem.fromString(it) }
+            res[0] to res[1]
         }
 
     fun part1(input: String): Int {
         val pairs = parseInput(input)
-
         val sum = pairs.foldIndexed(0) { index, acc, (left, right) ->
             // sum indices (1-indexed) of the pairs that are in the right order
-            val ok = PacketItem.compare(left, right) < 0
-            acc + if (ok) index + 1 else 0
+            acc + if (PacketItem.compare(left, right) < 0) index + 1 else 0
         }
         return sum
     }
@@ -102,17 +100,23 @@ fun main() {
     fun part2(input: String): Int {
         val dividers = sequenceOf("[[2]]", "[[6]]").map { PacketItem.fromString(it) }.toList()
 
-        val input = parseInput(input).flatMap { it.toList() }
-        val items = dividers.toMutableList()
-        items += input
+        val pairs = parseInput(input)
+        val packets = dividers.toMutableList()
+        packets += pairs.flatMap { it.toList() }
 
-        items.sortWith { left, right -> PacketItem.compare(left, right) }
-        val key = dividers.fold(1) { acc, divider ->
-            val found = items.withIndex()
-                .find { (_, item) -> PacketItem.compare(item, divider) == 0 }
-                ?: error("Not found: $divider")
+        // put the packets in the correct order
+        packets.sortWith { left, right -> PacketItem.compare(left, right) }
 
-            acc * (found.index + 1)
+        // find the decoder key
+        var key = 1
+        var i = 0
+        var d = 0
+        while (i < packets.size && d < dividers.size) {
+            if (PacketItem.compare(packets[i], dividers[d]) == 0) {
+                key *= i + 1
+                d++
+            }
+            i++
         }
         return key
     }
