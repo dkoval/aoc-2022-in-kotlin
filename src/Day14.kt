@@ -104,9 +104,7 @@ fun main() {
             }
 
             sands += curr
-            if (curr == source) {
-                done = true
-            }
+            done = curr == source
         }
         return sands.size
     }
