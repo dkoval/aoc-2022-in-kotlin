@@ -47,7 +47,7 @@ private sealed class Monkey {
 
 fun main() {
     fun parseInput(input: List<String>): List<Monkey> {
-        val math = """([a-z]{4}) (\+|-|\*|/) ([a-z]{4})""".toRegex()
+        val math = """([a-z]{4}) ([+\-*/]) ([a-z]{4})""".toRegex()
         return input.map { line ->
             val (name, expression) = line.split(": ")
             if (expression[0].isDigit()) {
