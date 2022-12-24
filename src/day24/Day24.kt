@@ -69,8 +69,8 @@ fun main() {
         val numRows = n - 2
         val numCols = input[0].length - 2
 
-        val expedition = Position(-1, input[0].indexOf('.') - 1)
-        val goal = Position(numRows, input[n - 1].indexOf('.') - 1)
+        val source = Position(-1, input[0].indexOf('.') - 1)
+        val target = Position(numRows, input[n - 1].indexOf('.') - 1)
 
         val blizzards = mutableSetOf<Blizzard>()
         for (row in 0 until numRows) {
@@ -81,7 +81,7 @@ fun main() {
                 }
             }
         }
-        return Grid(expedition, goal, blizzards, numRows, numCols)
+        return Grid(source, target, blizzards, numRows, numCols)
     }
 
     fun part1(input: List<String>): Int {
