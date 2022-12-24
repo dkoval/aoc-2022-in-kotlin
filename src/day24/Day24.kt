@@ -138,7 +138,7 @@ fun main() {
                     }
                 }
             }
-            error("Couldn't find the shortest path from $source to $target")
+            error("Couldn't find the shortest path from $source to $target starting at time $time")
         }
 
         return solve(grid.source, grid.target, 0)
