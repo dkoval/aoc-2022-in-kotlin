@@ -18,17 +18,17 @@ fun main() {
     }
 
     fun intToSnafu(num: Long): String {
-        // x mod 5 is in {0, 1, 2, 3, 4}
+        // x % 5 is in {0, 1, 2, 3, 4}
         // now, remap the value to get a SNAFU digit
         // 0 -> 0, 1 -> 1, 2 -> 2, 3 -> -2, 4 -> -1
-        fun snafuDigit(x: Long): Int {
-            return (if (x < 3) x else x - 5).toInt()
+        fun lastSnafuDigit(x: Long): Int {
+            return ((x + 2) % 5 - 2).toInt()
         }
 
         var x = num
         val sb = StringBuilder()
         while (x > 0) {
-            val digit = snafuDigit(x % 5)
+            val digit = lastSnafuDigit(x)
             sb.append(intToSnafuDigits[digit])
             x /= 5
             x += if (digit < 0) 1 else 0
