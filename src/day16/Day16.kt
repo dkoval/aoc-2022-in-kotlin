@@ -37,8 +37,9 @@ fun main() {
         fun traverse(valve: String, time: Int, opened: Set<String>, withElephant: Boolean): Int {
             // base case
             if (time == 0) {
-                // work alone first, then get an elephant to help you and make him aware about the opened valves;
-                // this will simulate the process of two of you working together
+                // Work alone first, then get an elephant to help you and make him aware about
+                // the valves your opened to let the elephant make his own decisions. 
+                // This will simulate the process of two of you working together.
                 if (withElephant) {
                     return traverse(start, maxTime, opened, false)
                 }
