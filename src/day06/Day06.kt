@@ -1,3 +1,7 @@
+package day06
+
+import readInputAsString
+
 private const val DAY_ID = "06"
 
 fun main() {
@@ -28,19 +32,19 @@ fun main() {
     fun part2(input: String): Int = solve(input, 14)
 
     // test if implementation meets criteria from the description, like:
-    check(part1(readInputAsString("Day${DAY_ID}_test_part1_1")) == 7)
-    check(part1(readInputAsString("Day${DAY_ID}_test_part1_2")) == 5)
-    check(part1(readInputAsString("Day${DAY_ID}_test_part1_3")) == 6)
-    check(part1(readInputAsString("Day${DAY_ID}_test_part1_4")) == 10)
-    check(part1(readInputAsString("Day${DAY_ID}_test_part1_5")) == 11)
+    check(part1(readInputAsString("day${DAY_ID}/Day${DAY_ID}_test_part1_1")) == 7)
+    check(part1(readInputAsString("day${DAY_ID}/Day${DAY_ID}_test_part1_2")) == 5)
+    check(part1(readInputAsString("day${DAY_ID}/Day${DAY_ID}_test_part1_3")) == 6)
+    check(part1(readInputAsString("day${DAY_ID}/Day${DAY_ID}_test_part1_4")) == 10)
+    check(part1(readInputAsString("day${DAY_ID}/Day${DAY_ID}_test_part1_5")) == 11)
 
-    check(part2(readInputAsString("Day${DAY_ID}_test_part2_1")) == 19)
-    check(part2(readInputAsString("Day${DAY_ID}_test_part2_2")) == 23)
-    check(part2(readInputAsString("Day${DAY_ID}_test_part2_3")) == 23)
-    check(part2(readInputAsString("Day${DAY_ID}_test_part2_4")) == 29)
-    check(part2(readInputAsString("Day${DAY_ID}_test_part2_5")) == 26)
+    check(part2(readInputAsString("day${DAY_ID}/Day${DAY_ID}_test_part2_1")) == 19)
+    check(part2(readInputAsString("day${DAY_ID}/Day${DAY_ID}_test_part2_2")) == 23)
+    check(part2(readInputAsString("day${DAY_ID}/Day${DAY_ID}_test_part2_3")) == 23)
+    check(part2(readInputAsString("day${DAY_ID}/Day${DAY_ID}_test_part2_4")) == 29)
+    check(part2(readInputAsString("day${DAY_ID}/Day${DAY_ID}_test_part2_5")) == 26)
 
-    val input = readInputAsString("Day06")
+    val input = readInputAsString("day${DAY_ID}/Day06")
     println(part1(input)) // answer = 1766
     println(part2(input)) // answer = 2383
 }

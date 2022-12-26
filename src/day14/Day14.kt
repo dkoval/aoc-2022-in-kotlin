@@ -1,3 +1,7 @@
+package day14
+
+import readInput
+
 private const val DAY_ID = "14"
 
 private data class Point(
@@ -110,11 +114,11 @@ fun main() {
     }
 
     // test if implementation meets criteria from the description, like:
-    val testInput = readInput("Day${DAY_ID}_test")
+    val testInput = readInput("day${DAY_ID}/Day${DAY_ID}_test")
     check(part1(testInput) == 24)
     check(part2(testInput) == 93)
 
-    val input = readInput("Day${DAY_ID}")
+    val input = readInput("day${DAY_ID}/Day$DAY_ID")
     println(part1(input)) // answer = 755
     println(part2(input)) // answer = 29805
 }

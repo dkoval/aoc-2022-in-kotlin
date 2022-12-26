@@ -1,10 +1,13 @@
+package day05
+
+import readInput
 import java.util.*
 
 private const val DAY_ID = "05"
 
-fun main() {
-    data class Instruction(val quantity: Int, val from: Int, val to: Int)
+private data class Instruction(val quantity: Int, val from: Int, val to: Int)
 
+fun main() {
     fun solve(input: List<String>, strategy: (stacks: Array<Deque<Char>>, instruction: Instruction) -> Unit): String {
         val data = input.takeWhile { line -> line.isNotEmpty() }
 
@@ -55,11 +58,11 @@ fun main() {
         }
 
     // test if implementation meets criteria from the description, like:
-    val testInput = readInput("Day${DAY_ID}_test")
+    val testInput = readInput("day${DAY_ID}/Day${DAY_ID}_test")
     check(part1(testInput) == "CMZ")
     check(part2(testInput) == "MCD")
 
-    val input = readInput("Day${DAY_ID}")
+    val input = readInput("day${DAY_ID}/Day$DAY_ID")
     println(part1(input)) // answer = JCMHLVGMG
     println(part2(input)) // answer = LVMRWSSPZ
 }

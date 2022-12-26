@@ -1,3 +1,7 @@
+package day13
+
+import readInputAsString
+
 private const val DAY_ID = "13"
 
 private sealed class PacketItem: Comparable<PacketItem> {
@@ -116,11 +120,11 @@ fun main() {
     }
 
     // test if implementation meets criteria from the description, like:
-    val testInput = readInputAsString("Day${DAY_ID}_test")
+    val testInput = readInputAsString("day${DAY_ID}/Day${DAY_ID}_test")
     check(part1(testInput) == 13)
     check(part2(testInput) == 140)
 
-    val input = readInputAsString("Day${DAY_ID}")
+    val input = readInputAsString("day${DAY_ID}/Day$DAY_ID")
     println(part1(input)) // answer = 5013
     println(part2(input)) // answer = 25038
 }

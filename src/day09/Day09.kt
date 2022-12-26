@@ -1,3 +1,6 @@
+package day09
+
+import readInput
 import kotlin.math.abs
 
 private const val DAY_ID = "09"
@@ -68,12 +71,12 @@ fun main() {
     fun part2(input: List<String>): Int = solve(input, 10)
 
     // test if implementation meets criteria from the description, like:
-    val testInput = readInput("Day${DAY_ID}_test")
+    val testInput = readInput("day${DAY_ID}/Day${DAY_ID}_test")
     check(part1(testInput) == 13)
     check(part2(testInput) == 1)
-    check(part2(readInput("Day${DAY_ID}_test_part2")) == 36)
+    check(part2(readInput("day${DAY_ID}/Day${DAY_ID}_test_part2")) == 36)
 
-    val input = readInput("Day${DAY_ID}")
+    val input = readInput("day${DAY_ID}/Day$DAY_ID")
     println(part1(input)) // answer = 6037
     println(part2(input)) // answer = 2485
 }

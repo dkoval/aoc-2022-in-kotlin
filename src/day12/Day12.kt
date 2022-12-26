@@ -1,3 +1,6 @@
+package day12
+
+import readInput
 import java.util.*
 
 private const val DAY_ID = "12"
@@ -112,11 +115,11 @@ fun main() {
     }
 
     // test if implementation meets criteria from the description, like:
-    val testInput = readInput("Day${DAY_ID}_test")
+    val testInput = readInput("day${DAY_ID}/Day${DAY_ID}_test")
     check(part1(testInput) == 31)
     check(part2(testInput) == 29)
 
-    val input = readInput("Day${DAY_ID}")
+    val input = readInput("day${DAY_ID}/Day$DAY_ID")
     println(part1(input)) // answer = 380
     println(part2(input)) // answer = 375
 }

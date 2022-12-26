@@ -1,3 +1,7 @@
+package day08
+
+import readInput
+
 private const val DAY_ID = "08"
 
 fun main() {
@@ -81,18 +85,18 @@ fun main() {
         }
 
         val visible = findVisibleTreesInInterior(grid)
-        val deltas = arrayOf(-1 to 0, 1 to 0, 0 to -1, 0 to 1) // look up, down, left, right
+        val deltas = listOf(-1 to 0, 1 to 0, 0 to -1, 0 to 1) // look up, down, left, right
         return visible.maxOf { (row, col) ->
             deltas.fold(1) { acc, (dx, dy) -> acc * viewingDistance(row, col, dx, dy) }
         }
     }
 
     // test if implementation meets criteria from the description, like:
-    val testInput = readInput("Day${DAY_ID}_test")
+    val testInput = readInput("day${DAY_ID}/Day${DAY_ID}_test")
     check(part1(testInput) == 21)
     check(part2(testInput) == 8)
 
-    val input = readInput("Day${DAY_ID}")
+    val input = readInput("day${DAY_ID}/Day$DAY_ID")
     println(part1(input)) // answer = 1560
     println(part2(input)) // answer = 252000
 }
