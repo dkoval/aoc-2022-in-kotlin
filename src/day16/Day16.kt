@@ -21,7 +21,8 @@ fun main() {
                 val (id, rate) = valve.let { it.find(s1)!!.destructured }
                 val adj = tunnels.let { it.find(s2)!!.groupValues[1] }.split(", ")
                 Valve(id, rate.toInt(), adj)
-            }.associateBy { it.id }
+            }
+            .associateBy { it.id }
     }
 
     fun solve(lookup: Map<String, Valve>, start: String, maxTime: Int, withElephant: Boolean): Int {
