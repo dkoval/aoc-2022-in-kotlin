@@ -9,7 +9,7 @@ private data class Cell(
     val row: Int,
     val col: Int
 ) {
-    fun withinBoundaries(numRows: Int, numCols: Int): Boolean =
+    fun isInBounds(numRows: Int, numCols: Int): Boolean =
         row in 0 until numRows && col in 0 until numCols
 }
 
@@ -59,7 +59,7 @@ fun main() {
 
         val m = grid.size
         val n = grid[0].size
-        val directions = arrayOf(-1 to 0, 1 to 0, 0 to -1, 0 to 1)
+        val directions = listOf(-1 to 0, 1 to 0, 0 to -1, 0 to 1)
 
         val q: Queue<Cell> = ArrayDeque()
         val visited: MutableSet<Cell> = hashSetOf()
@@ -77,7 +77,7 @@ fun main() {
                 for ((dx, dy) in directions) {
                     val next = Cell(curr.row + dx, curr.col + dy)
                     // out of boundaries or visited?
-                    if (!next.withinBoundaries(m, n) || next in visited ) {
+                    if (!next.isInBounds(m, n) || next in visited ) {
                         continue
                     }
                     // can go?

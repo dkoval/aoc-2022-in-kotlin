@@ -50,7 +50,7 @@ fun main() {
         val source = Point(500, 0)
         val data = parseInput(input)
 
-        val directions = arrayOf(0 to 1, -1 to 1, 1 to 1) // down, down-left, down-right
+        val directions = listOf(0 to 1, -1 to 1, 1 to 1) // down, down-left, down-right
         val cave = scanCave(data)
 
         var done = false
@@ -86,7 +86,7 @@ fun main() {
         val source = Point(500, 0)
         val data = parseInput(input)
 
-        val directions = arrayOf(0 to 1, -1 to 1, 1 to 1) // down, down-left, down-right
+        val directions = listOf(0 to 1, -1 to 1, 1 to 1) // down, down-left, down-right
         val cave = scanCave(data)
 
         var done = false
