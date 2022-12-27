@@ -15,12 +15,12 @@ private enum class Direction(
     RIGHT(0, 1);
 
     companion object {
-        fun fromString(s: String): Direction = when (s) {
-            "^" -> UP
-            "v" -> DOWN
-            "<" -> LEFT
-            ">" -> RIGHT
-            else -> error("Unknown direction: $s")
+        fun fromChar(c: Char): Direction = when (c) {
+            '^' -> UP
+            'v' -> DOWN
+            '<' -> LEFT
+            '>' -> RIGHT
+            else -> error("Unknown direction: $c")
         }
     }
 }
@@ -76,7 +76,7 @@ fun main() {
             for (col in 0 until numCols) {
                 val c = input[row + 1][col + 1]
                 if (c != '.') {
-                    blizzards += Blizzard(Position(row, col), Direction.fromString("$c"))
+                    blizzards += Blizzard(Position(row, col), Direction.fromChar(c))
                 }
             }
         }
