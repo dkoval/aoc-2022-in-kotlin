@@ -85,8 +85,9 @@ fun main() {
                     continue
                 }
 
-                // How much time do we need to collect all the required minerals?
-                // It also takes an extra 1 unit of time to build a robot.
+                // How much time does it take to build a new robot?
+                // - 1 unit of time to assembly a robot;
+                // - plus time spent on collecting the required minerals.
                 val spentTime = 1 + costs.maxOf { (i, cost) ->
                     if (curr.minerals[i] >= cost) 0 else divRoundUp(cost - curr.minerals[i], curr.robots[i])
                 }
@@ -97,7 +98,7 @@ fun main() {
                     continue
                 }
                 val nextMinerals = (0..3).map { i -> curr.minerals[i] - blueprint.costs[x][i] + curr.robots[i] * spentTime }
-                val nextRobots = curr.robots.toMutableList().also { it[x]++ }
+                val nextRobots = curr.robots.mapIndexed { i, count -> if (i == x) count + 1 else count }
                 enqueue(State(nextTime, nextMinerals, nextRobots))
             }
         }
