@@ -2,6 +2,7 @@ package day19
 
 import readInput
 import java.util.*
+import kotlin.system.measureTimeMillis
 
 private const val DAY_ID = "19"
 
@@ -45,7 +46,7 @@ fun main() {
             val robots: List<Int>
         )
 
-        val maxRobotsNeeded = (0..3).map { i -> blueprint.costs.maxOf { costs -> costs[i] } }
+        val maxCanSpend = (0..3).map { i -> blueprint.costs.maxOf { costs -> costs[i] } }
 
         // ~ BFS to explore all possible states
         val q: Queue<State> = ArrayDeque()
@@ -57,7 +58,7 @@ fun main() {
             }
         }
 
-        fun divRoundUp(x: Int, y: Int): Int = (x - 1) / y + 1
+        infix fun Int.divRoundUp(y: Int): Int = (this - 1) / y + 1
 
         var best = 0
         enqueue(State(time, listOf(0, 0, 0, 0), listOf(1, 0, 0, 0)))
@@ -74,7 +75,7 @@ fun main() {
 
             for (x in 0..3) {
                 // Do we already have enough x-collecting robots?
-                if (x != 3 && curr.robots[x] == maxRobotsNeeded[x]) {
+                if (x != 3 && curr.robots[x] >= maxCanSpend[x]) {
                     continue
                 }
 
@@ -89,15 +90,23 @@ fun main() {
                 // - 1 unit of time to assembly a robot
                 // - plus time spent on collecting the required minerals
                 val spentTime = 1 + costs.maxOf { (i, cost) ->
-                    if (curr.minerals[i] >= cost) 0 else divRoundUp(cost - curr.minerals[i], curr.robots[i])
+                    if (curr.minerals[i] >= cost) 0 else (cost - curr.minerals[i]) divRoundUp curr.robots[i]
                 }
 
                 // Proceed to the next state
-                val nextTime = curr.time - spentTime
+                val nextTime = curr.time - spentTime // remaining time
                 if (nextTime <= 0) {
                     continue
                 }
-                val nextMinerals = (0..3).map { i -> curr.minerals[i] - blueprint.costs[x][i] + curr.robots[i] * spentTime }
+
+                val nextMinerals = (0..3).map { i ->
+                    // Optimization to get part 2 working:
+                    // it's pointless to collect more minerals of a certain type i than we actually need
+                    // for building new robots collecting remaining types of minerals
+                    val ans = curr.minerals[i] - blueprint.costs[x][i] + curr.robots[i] * spentTime
+                    if (i < 3) minOf(ans, maxCanSpend[i] * nextTime) else ans
+                }
+
                 val nextRobots = curr.robots.mapIndexed { i, count -> if (i == x) count + 1 else count }
                 enqueue(State(nextTime, nextMinerals, nextRobots))
             }
@@ -112,7 +121,11 @@ fun main() {
     }
 
     fun part2(input: List<String>): Long {
-        TODO()
+        val time = 32
+        val blueprints = parseInput(input)
+        return blueprints.asSequence()
+            .take(3)
+            .fold(1L) { acc, blueprint -> acc * solve(blueprint, time) }
     }
 
     // test if implementation meets criteria from the description, like:
@@ -120,6 +133,11 @@ fun main() {
     check(part1(testInput) == 33)
 
     val input = readInput("day${DAY_ID}/Day${DAY_ID}")
-    println(part1(input)) // answer = 1725
-    //println(part2(input))
+    measureTimeMillis {
+        println(part1(input)) // answer = 1725
+    }.also { println("Part 1 took $it ms") }
+
+    measureTimeMillis {
+        println(part2(input)) // answer = 15510
+    }.also { println("Part 2 took $it ms") }
 }
