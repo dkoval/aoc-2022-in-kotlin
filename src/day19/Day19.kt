@@ -86,8 +86,8 @@ fun main() {
                 }
 
                 // How much time does it take to build a new robot?
-                // - 1 unit of time to assembly a robot;
-                // - plus time spent on collecting the required minerals.
+                // - 1 unit of time to assembly a robot
+                // - plus time spent on collecting the required minerals
                 val spentTime = 1 + costs.maxOf { (i, cost) ->
                     if (curr.minerals[i] >= cost) 0 else divRoundUp(cost - curr.minerals[i], curr.robots[i])
                 }
